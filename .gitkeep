@@ -1,0 +1,4 @@
+# Create .gitkeep files
+echo "" > Data/.gitkeep
+echo "" > Frontend/Files/.gitkeep
+echo "" > Frontend/Graphics/images/.gitkeep

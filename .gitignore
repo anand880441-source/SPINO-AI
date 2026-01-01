@@ -1,0 +1,107 @@
+# ========== PYTHON ==========
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ========== VIRTUAL ENVIRONMENTS ==========
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+spino_env/
+.conda/
+miniconda/
+anaconda/
+pythonenv*
+
+# ========== SECRETS & API KEYS ==========
+# NEVER COMMIT THESE!
+.env
+.env.*
+secrets.json
+config.json
+keys.json
+credentials.json
+*.key
+*.pem
+*.cert
+*.secret
+*.token
+access_token*
+refresh_token*
+api_key*
+apikey*
+secret*
+password*
+
+# ========== DATA FILES (YOUR APP DATA) ==========
+Data/*
+!Data/.gitkeep  # Keep empty folder
+*.data
+*.mp3
+*.wav
+*.txt
+*.log
+*.json
+*.html
+*.xml
+*.csv
+
+# ========== FRONTEND FILES ==========
+Frontend/Files/*
+!Frontend/Files/.gitkeep
+Frontend/__pycache__/
+Frontend/GUI.cpython-*.pyc
+
+# ========== BACKEND CACHE ==========
+Backend/__pycache__/
+Backend/*.pyc
+
+# ========== IDE & EDITOR ==========
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========== TEMP FILES ==========
+temp/
+tmp/
+*.tmp
+*.temp
+
+# ========== LOGS ==========
+*.log
+logs/
+debug.log
+error.log
+
+# ========== OPERATING SYSTEM ==========
+*.db
+*.sqlite
+*.sqlite3
+dump.rdb
