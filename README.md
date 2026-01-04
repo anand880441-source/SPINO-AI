@@ -1,31 +1,63 @@
-# SPINO AI - Personal Assistant
+# 🤖 SPINO AI - Intelligent Voice Assistant
 
-SPINO AI is an intelligent personal assistant with voice capabilities, automation, and chatbot features.
+<div align="center">
 
-## Features
-- ��� Voice recognition and speech synthesis
-- ��� Real-time web search
-- ���️ Image generation
-- ��� Chatbot with memory and learning
-- ��� GUI interface with modern design
-- ��� Task automation
-- ���️ Multi-language support
+![SPINO AI Logo](Frontend/Graphics/images/Spino.gif)
+*A multilingual AI assistant with image generation capabilities*
 
-## Installation
-1. Clone the repository
-2. Install Python dependencies
-3. Set up environment variables
-4. Run: python main.py
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-brightgreen)](https://github.com/anand880441-source/SPINO-AI)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Active-success)](https://github.com/anand880441-source/SPINO-AI)
 
-## Project Structure
-SPINO-AI/
-├── Backend/          # Core AI modules
-├── Frontend/         # GUI interface
-├── Data/             # Application data
-├── main.py           # Entry point
-└── README.md         # Documentation
+*Multilingual • AI-Powered • Voice-Controlled • Image Generation*
 
-## License
-MIT License
+</div>
 
-# SPINO-AI
+## ✨ Features
+
+### 🎤 **Voice Control**
+- Real-time speech recognition
+- Natural voice responses
+- Voice command control (pause/resume/stop)
+- Multilingual support (Hindi/English)
+
+### 🖼️ **AI Image Generation**
+- Generate images from text descriptions
+- Uses HuggingFace AI models (Stable Diffusion)
+- 4 images generated concurrently
+- Automatic saving and opening
+- Fallback models for reliability
+
+### 🤖 **Smart Automation**
+- Open/close applications
+- Web search (Google, YouTube)
+- System controls (volume, mute)
+- Content writing (applications, letters, code)
+- YouTube music playback
+
+### 🌐 **Multilingual Interface**
+- Real-time language switching
+- Hindi and English support
+- Context-aware responses
+- Language usage tracking
+
+### 💻 **Advanced Capabilities**
+- Real-time web search
+- Chat with multiple AI models (Groq, Gemini)
+- File operations and management
+- GUI with animated interface
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.8+
+- Windows OS (optimized for Windows 10/11)
+- Microphone and speakers
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/anand880441-source/SPINO-AI.git
+cd SPINO-AI
