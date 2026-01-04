@@ -1,7 +1,3 @@
-"""
-Enhanced LanguageManager.py - Advanced language management with presets
-"""
-
 import json
 import os
 import pickle
@@ -42,8 +38,7 @@ class EnhancedLanguageManager:
         """Get current language with enhanced info"""
         config = self.load_config()
         
-        # Add usage statistics
-        config["total_switches"] = sum(config["switch_count"].values())
+        config["total_switches"] = sum(config.get("switch_count", {"Hindi": 0, "English": 0}).values())
         config["most_used"] = max(config["switch_count"], key=config["switch_count"].get)
         config["usage_percentage"] = {
             lang: (count / config["total_switches"] * 100) if config["total_switches"] > 0 else 0
@@ -98,12 +93,10 @@ class EnhancedLanguageManager:
             config = self.load_config()
             old_lang = config.get("current_language", "Hindi")
             
-            # Update statistics
             config["switch_count"][old_lang] = config["switch_count"].get(old_lang, 0)
             config["switch_count"][languages[lang_key]["display_name"]] = \
                 config["switch_count"].get(languages[lang_key]["display_name"], 0) + 1
             
-            # Update config
             config.update(languages[lang_key])
             config["current_language"] = languages[lang_key]["display_name"]
             config["last_switch"] = datetime.now().isoformat()
@@ -134,10 +127,9 @@ class EnhancedLanguageManager:
                 "timestamp": datetime.now().isoformat(),
                 "from": from_lang,
                 "to": to_lang,
-                "duration": None  # Will be updated on next switch
+                "duration": None  
             })
             
-            # Update previous entry duration
             if len(history) > 1:
                 prev = history[-2]
                 curr = history[-1]
@@ -146,7 +138,7 @@ class EnhancedLanguageManager:
                 prev["duration"] = (curr_time - prev_time).total_seconds()
             
             with open(self.history_file, "wb") as f:
-                pickle.dump(history[-100:], f)  # Keep last 100 switches
+                pickle.dump(history[-100:], f) 
                 
         except Exception as e:
             print(f"History save error: {e}")
@@ -244,12 +236,11 @@ Mixed: "Time batao" → "अभी 9:30 बजे हैं (It's 9:30 PM) ⏰" 
             "voice": config["assistant_voice"]
         }
         
-        # Add history if available
         try:
             if os.path.exists(self.history_file):
                 with open(self.history_file, "rb") as f:
                     history = pickle.load(f)
-                    stats["recent_switches"] = history[-5:]  # Last 5 switches
+                    stats["recent_switches"] = history[-5:]  
         except:
             stats["recent_switches"] = []
         
@@ -294,10 +285,8 @@ Mixed: "Time batao" → "अभी 9:30 बजे हैं (It's 9:30 PM) ⏰" 
         
         return f"{emojis.get(current, '🌐')} | 🔄 {config['total_switches']} switches | ⭐ {config['most_used']} most used"
 
-# Global instance
 language_manager = EnhancedLanguageManager()
 
-# Helper functions
 def switch_to_hindi(user_preference=None):
     return language_manager.switch_language("hindi", user_preference)
 

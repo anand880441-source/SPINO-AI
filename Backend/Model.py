@@ -1,17 +1,24 @@
-import cohere
+from groq import Groq  
 from rich import print
 from dotenv import dotenv_values
+import time
+import random
 
 env_vars = dotenv_values(".env")
+env_vars = dotenv_values(".env")
+GroqAPIKey = (
+    env_vars.get("GroqAPIKey1") or 
+    env_vars.get("GroqAPIKey2") or 
+    env_vars.get("GroqAPIKey3") or 
+    env_vars.get("GroqAPIKey4") 
+)
 
-CohereAPIKey = env_vars.get("CohereAPIKey")
-
-co = cohere.Client(api_key=CohereAPIKey)
+client = Groq(api_key=GroqAPIKey) if GroqAPIKey else None
 
 funcs = [
     "exit", "general", "realtime", "open", "close", "play",
     "generate image", "system", "content", "google search",
-    "youtube search", "reminder", "switch language", "voice control"  # ADDED
+    "youtube search", "reminder", "switch language", "voice control"
 ]
 
 message = []
@@ -51,47 +58,60 @@ ChatHistory = [
     {"role": "Chatbot", "message": "general chat with me."}
 ]
 
+def rate_limit_delay():
+    """Add delay to avoid rate limits"""
+    delay = random.uniform(2, 4)  
+    print(f"[Rate Limiter] Waiting {delay:.1f} seconds...")
+    time.sleep(delay)
 
 def FirstLayerDMM(prompt: str = "test"):
-
-    message.append({"role" : "user", "content": f"{prompt}"})
-
-    stream = co.chat_stream(
-        model='command-a-03-2025',
-        message=prompt,
-        temperature=0.7,
-        chat_history=ChatHistory,
-        prompt_truncation='OFF',
-        connectors=[],
-        preamble=preamble
-    )
-
-    response = ""
-
-    for event in stream:
-        if event.event_type == "text-generation":
-            response += event.text
-
-    response = response.replace("\n", "")
-    response = response.split(",")
-
-    response = [i.strip() for i in response]
-
-    temp = []
-
-    for task in response:
-        for func in funcs:
-            if task.startswith(func):
-                temp.append(task)
+    if not client:
+        print("❌ Groq client not initialized. Check your API key.")
+        return ["general"]
     
-    response = temp
-
-    if "(query)" in response:
-        newresponse = FirstLayerDMM(prompt=prompt)
-        return newresponse
-    else:
-        return response
+    rate_limit_delay()
     
+    messages = [
+        {"role": "system", "content": preamble},
+        {"role": "user", "content": prompt}
+    ]
+    
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
+            temperature=0.3,  
+            max_tokens=100,
+            top_p=0.9
+        )
+        
+        response = completion.choices[0].message.content.strip()
+        
+        response = response.replace("\n", "")
+        response = response.split(",")
+        response = [i.strip() for i in response]
+        
+        temp = []
+        for task in response:
+            for func in funcs:
+                if task.startswith(func):
+                    temp.append(task)
+        
+        response = temp
+        
+        if "(query)" in str(response):
+            return ["general"]
+        else:
+            return response
+            
+    except Exception as e:
+        print(f"❌ Error in classifier: {e}")
+        return ["general"]
+
 if __name__ == "__main__":
     while True:
-        print(FirstLayerDMM(input(">>> ")))
+        user_input = input(">>> ").strip()
+        if user_input.lower() == 'exit':
+            break
+        result = FirstLayerDMM(user_input)
+        print(f"Decision: {result}")

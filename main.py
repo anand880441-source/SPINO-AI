@@ -1,199 +1,3 @@
-# from Frontend.GUI import (
-#     GraphicalUserInterface,
-#     SetAssistantStatus,
-#     ShowTextToScreen,
-#     TempDirectoryPath,
-#     SetMicrophoneStatus,
-#     AnswerModifier,
-#     QueryModifier,
-#     GetAssistantStatus,
-#     GetMicrophoneStatus
-# )
-# from Backend.Model import FirstLayerDMM
-# from Backend.RealtimeSearchEngine import RealtimeSearchEngine
-# from Backend.Automation import Automation
-# from Backend.SpeechToText import SpeechRecognition
-# from Backend.Chatbot import ChatBot
-# from Backend.TextToSpeech import TextToSpeech
-# from dotenv import dotenv_values
-# from asyncio import run
-# from time import sleep
-# import subprocess
-# import threading
-# import json
-# import os
-# import warnings
-
-# warnings.filterwarnings("ignore", category=UserWarning)
-# env_vars = dotenv_values(".env")
-# Username = env_vars.get("Username")
-# Assistantname = env_vars.get("Assistantname")
-# DefaultMessage = f'''{Username}. Hello {Assistantname}, How are you?
-# {Assistantname} : Welcome {Username}, I am doing well. How may i help you?'''
-# subprocesses = []
-# Functions = ["open", "close", "play", "system", "content", "google search", "youtube search"]  # Fixed
-
-
-# def ShowDefaultChatIfNoChats():
-#     File = open(r'Data\ChatLog.json', "r", encoding='utf-8')
-#     if len(File.read()) < 5:
-#         with open (TempDirectoryPath('Database.data'), 'w', encoding='utf-8') as file:
-#             file.write("")
-#         with open (TempDirectoryPath('Database.data'), 'w', encoding='utf-8') as file:
-#             file.write(DefaultMessage)
-
-# def ReadChatLogJson():
-#     with open (r'Data\ChatLog.json', "r", encoding='utf-8') as file:
-#         chatlog_data = json.load(file)
-#     return chatlog_data 
-
-# def ChatLogIntegration():
-#     json_data = ReadChatLogJson()
-#     formatted_chatlog = ""
-#     for entry in json_data:
-#         if entry["role"] == "user":
-#             formatted_chatlog += f"User: {entry['content']}\n"
-#         elif entry["role"] == "assistant":
-#             formatted_chatlog += f"Assistant: {entry['content']}\n"
-#     formatted_chatlog = formatted_chatlog.replace("User", Username + " ")
-#     formatted_chatlog = formatted_chatlog.replace("Assistant", Assistantname + " ")
-
-#     with open(TempDirectoryPath('Database.data'), 'w', encoding='utf-8') as file:
-#         file.write(AnswerModifier(formatted_chatlog))
-
-# def ShowChatsOnGUI():
-#     File = open(TempDirectoryPath('Database.data'), "r", encoding='utf-8')
-#     Data = File.read()
-#     if len(str(Data))>0:
-#         lines = Data.split('\n')
-#         result = '\n'.join(lines)
-#         File.close()
-#         File = open(TempDirectoryPath('Responses.data'), "w", encoding='utf-8')
-#         File.write(result)
-#         File.close()
-
-# def InitialExecution():
-#     SetMicrophoneStatus("False")
-#     ShowTextToScreen("")
-#     ShowDefaultChatIfNoChats()
-#     ChatLogIntegration()
-#     ShowChatsOnGUI()
-
-# InitialExecution()
-
-# def MainExecution():
-
-#     TaskExecution = False
-#     ImageExecution = False
-#     ImageGenerationQuery = ""
-
-#     SetAssistantStatus("Listening...")
-#     Query = SpeechRecognition()
-#     ShowTextToScreen(f"{Username} : {Query}")
-#     SetAssistantStatus("Thinking...")
-#     Decision = FirstLayerDMM(Query)
-
-#     print("")
-#     print(f"Decision : {Decision}")
-#     print("")
-
-#     if not Decision or len(Decision) == 0:  # Added check for empty Decision
-#         SetAssistantStatus("I didn't understand that. Could you repeat?")
-#         return False
-
-#     G = any([i for i in Decision if i.startswith("general")])  # Fixed
-#     R = any([i for i in Decision if i.startswith("realtime")])  # Fixed
-
-#     Merged_query = " and ".join(
-#         [" ".join(i.split()[1:]) for i in Decision if i.startswith("general") or i.startswith("realtime")]
-#     )
-
-#     for queries in Decision:
-#         if "generate " in queries:
-#             ImageGenerationQuery = str(queries)
-#             ImageExecution = True
-
-#     for queries in Decision:
-#         if TaskExecution == False:
-#             if any(queries.startswith(func) for func in Functions):  # Fixed
-#                 run(Automation(list(Decision)))
-#                 TaskExecution = True
-#     if ImageExecution == True:
-#         with open(r"Frontend\Files\ImageGeneration.data", "w") as file:
-#             file.write(f"{ImageGenerationQuery}, True")
-
-#         try:
-#             p1 = subprocess.Popen(['python', r'Backend\ImageGeneration.py'],  # Fixed
-#                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-#                                  stdin=subprocess.PIPE, shell=False
-#                                  )
-#             subprocesses.append(p1)
-#         except Exception as e:
-#             print(f"Error starting ImageGeneration.py: {e}")
-
-#     if G and R or R:
-#         SetAssistantStatus("Searching...")
-#         Answer = RealtimeSearchEngine(QueryModifier(Merged_query))
-#         ShowTextToScreen(f"{Assistantname} : {Answer}")
-#         SetAssistantStatus("Answering...")
-#         TextToSpeech(Answer)
-#         return True
-    
-#     else:
-#         for Queries in Decision:
-#             if "general" in Queries:
-#                 SetAssistantStatus("Thinking...")
-#                 QueryFinal = Queries.replace("general ","")
-#                 Answer = ChatBot(QueryModifier(QueryFinal))
-#                 ShowTextToScreen(f"{Assistantname} : {Answer}")
-#                 TextToSpeech(Answer)
-#                 return True
-            
-#             elif "realtime" in Queries:
-#                 SetAssistantStatus("Searching...")
-#                 QueryFinal = Queries.replace("realtime ","")
-#                 Answer = RealtimeSearchEngine(QueryModifier(QueryFinal))
-#                 ShowTextToScreen(f"{Assistantname} : {Answer}")
-#                 TextToSpeech(Answer)
-#                 return True
-            
-#             elif "exit" in Queries:
-#                 QueryFinal = "Okay, Bye"
-#                 Answer = ChatBot(QueryModifier(QueryFinal))
-#                 ShowTextToScreen(f"{Assistantname} : {Answer}")
-#                 SetAssistantStatus("Answering...")
-#                 TextToSpeech(Answer)
-#                 SetAssistantStatus("Answering...")
-#                 os._exit(1)
-
-# def FirstThread():
-
-#     while True:
-
-#         CurrentStatus = GetMicrophoneStatus()
-
-#         if CurrentStatus == "True":
-#             MainExecution()
-
-#         else:
-#             AIStatus = GetAssistantStatus()
-
-#             if "Available..." in AIStatus:
-#                 sleep(0.1)
-#             else:
-#                 SetAssistantStatus("Available...")
-
-# def SecondThread():
-
-#     GraphicalUserInterface()
-
-# if __name__ == "__main__":
-#     thread2 = threading.Thread(target=FirstThread, daemon=True)
-#     thread2.start()
-#     SecondThread()
-
-
-#new
 from Frontend.GUI import (
     GraphicalUserInterface,
     SetAssistantStatus,
@@ -218,8 +22,9 @@ import threading
 import json
 import os
 import warnings
+import asyncio
+from Backend.Automation import Automation
 
-# Import language manager
 try:
     from Backend.LanguageManager import get_language_status, get_current_language
 except ImportError:
@@ -233,7 +38,6 @@ env_vars = dotenv_values(".env")
 Username = env_vars.get("Username", "Anand Suthar")
 Assistantname = env_vars.get("Assistantname", "SPINO")
 
-# Dynamic welcome message based on language
 def get_welcome_message():
     config = get_current_language()
     current_lang = config.get("current_language", "Hindi")
@@ -248,13 +52,13 @@ def get_welcome_message():
 DefaultMessage = get_welcome_message()
 
 subprocesses = []
-Functions = ["open", "close", "play", "system", "content", "google search", "youtube search", "switch language"]
+Functions = ["open", "close", "play", "system", "content", "google search", 
+             "youtube search", "switch language", "generate", "create image"]
 
 def ShowDefaultChatIfNoChats():
     os.makedirs("Data", exist_ok=True)
     chatlog_file = r'Data\ChatLog.json'
     
-    # Create ChatLog.json if it doesn't exist
     if not os.path.exists(chatlog_file):
         with open(chatlog_file, "w", encoding='utf-8') as f:
             json.dump([], f, indent=4)
@@ -316,7 +120,6 @@ def InitialExecution():
     ShowDefaultChatIfNoChats()
     ChatLogIntegration()
     ShowChatsOnGUI()
-    # Show current language status on startup
     lang_status = get_language_status()
     SetAssistantStatus(f"Ready - {lang_status}")
 
@@ -353,13 +156,13 @@ def MainExecution():
         [" ".join(i.split()[1:]) for i in Decision if i.startswith("general") or i.startswith("realtime")]
     )
 
-    # Check for image generation
+    ImageExecution = False
     for queries in Decision:
-        if "generate" in queries:
+        if "generate" in queries.lower() or "create image" in queries.lower():
             ImageGenerationQuery = str(queries)
             ImageExecution = True
+            break
 
-    # Check for automation tasks (including language switching)
     for queries in Decision:
         if not TaskExecution:
             if any(queries.startswith(func) for func in Functions):
@@ -370,36 +173,30 @@ def MainExecution():
                     print(f"Automation error: {e}")
                     SetAssistantStatus(f"Error: {str(e)[:50]}")
 
-    # Handle image generation
-    if ImageExecution:
-        os.makedirs(r"Frontend\Files", exist_ok=True)
-        with open(r"Frontend\Files\ImageGeneration.data", "w") as file:
-            file.write(f"{ImageGenerationQuery},True")
+    # if ImageExecution:
+    #     os.makedirs(r"Frontend\Files", exist_ok=True)
+    #     with open(r"Frontend\Files\ImageGeneration.data", "w") as file:
+    #         file.write(f"{ImageGenerationQuery},True")
 
-        try:
-            p1 = subprocess.Popen(['python', r'Backend\ImageGeneration.py'],
-                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                 stdin=subprocess.PIPE, shell=False)
-            subprocesses.append(p1)
-        except Exception as e:
-            print(f"Error starting ImageGeneration.py: {e}")
-            SetAssistantStatus("Image generation failed")
+    #     try:
+    #         p1 = subprocess.Popen(['python', r'Backend\ImageGeneration.py'],
+    #                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+    #                              stdin=subprocess.PIPE, shell=False)
+    #         subprocesses.append(p1)
+    #     except Exception as e:
+    #         print(f"Error starting ImageGeneration.py: {e}")
+    #         SetAssistantStatus("Image generation failed")
 
-    # Handle language switch responses specially
     for queries in Decision:
         if "switch language" in queries:
-            # Language switch already handled by Automation.py
-            # Just show success message
             lang_status = get_language_status()
             SetAssistantStatus(lang_status)
             ShowTextToScreen(f"{Assistantname} : {lang_status}")
             TextToSpeech(f"Language switched successfully.")
             return True
 
-    # Handle general and realtime queries
     if G and R or R:
         SetAssistantStatus("Searching...")
-        # Import RealtimeSearchEngine only if needed
         try:
             from Backend.RealtimeSearchEngine import RealtimeSearchEngine
             Answer = RealtimeSearchEngine(QueryModifier(Merged_query))
@@ -450,7 +247,6 @@ def MainExecution():
                 sleep(2)
                 os._exit(1)
     
-    # If we get here, nothing was executed
     SetAssistantStatus("Ready - " + get_language_status())
     return True
 
@@ -485,5 +281,8 @@ if __name__ == "__main__":
     
     thread2 = threading.Thread(target=FirstThread, daemon=True)
     thread2.start()
+
+    # print("🧪 Testing Automation directly...")
+    # asyncio.run(Automation(["generate image of modi"]))
     
     SecondThread()

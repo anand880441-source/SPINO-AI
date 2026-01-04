@@ -1,4 +1,7 @@
-# ========== PYTHON ==========
+Back-up/Back-up
+.gitkeep
+reset_chat.py
+
 __pycache__/
 *.py[cod]
 *$py.class
@@ -22,7 +25,6 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# ========== VIRTUAL ENVIRONMENTS ==========
 .venv/
 venv/
 env/
@@ -35,8 +37,6 @@ miniconda/
 anaconda/
 pythonenv*
 
-# ========== SECRETS & API KEYS ==========
-# NEVER COMMIT THESE!
 .env
 .env.*
 secrets.json
@@ -55,7 +55,6 @@ apikey*
 secret*
 password*
 
-# ========== DATA FILES (YOUR APP DATA) ==========
 Data/*
 !Data/.gitkeep  # Keep empty folder
 *.data
@@ -68,17 +67,14 @@ Data/*
 *.xml
 *.csv
 
-# ========== FRONTEND FILES ==========
 Frontend/Files/*
 !Frontend/Files/.gitkeep
 Frontend/__pycache__/
 Frontend/GUI.cpython-*.pyc
 
-# ========== BACKEND CACHE ==========
 Backend/__pycache__/
 Backend/*.pyc
 
-# ========== IDE & EDITOR ==========
 .vscode/
 .idea/
 *.swp
@@ -88,20 +84,19 @@ Backend/*.pyc
 Thumbs.db
 desktop.ini
 
-# ========== TEMP FILES ==========
 temp/
 tmp/
 *.tmp
 *.temp
 
-# ========== LOGS ==========
 *.log
 logs/
 debug.log
 error.log
 
-# ========== OPERATING SYSTEM ==========
 *.db
 *.sqlite
 *.sqlite3
 dump.rdb
+
+test.py

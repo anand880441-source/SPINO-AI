@@ -1,76 +1,3 @@
-# import asyncio
-# from random import randint
-# from PIL import Image
-# import requests
-# from dotenv import get_key
-# import os
-# from time import sleep
-
-# def open_images(promot):
-#     folder_path = r"Data"
-#     promot = promot.replace(" ", "_")
-
-#     Files = [f"{promot}{i}.jpg" for i in range(1, 5)]
-
-#     for jpg_file in Files:
-#         image_path = os.path.join(folder_path, jpg_file)
-
-#         try:
-#             img = Image.open(image_path)
-#             print(f"Opening image: {image_path}")
-#             img.show()
-#             sleep(1)
-
-#         except IOError:
-#             print(f"Unable to open {image_path}")
-    
-# API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
-# headeras = {"Authorization": f"Bearer {get_key('.env', 'HuggingFaceAPIKey')}"}
-
-# async def query(payload):
-#     response = await asyncio.to_thread(requests.post, API_URL, headeras=headeras, json=payload)
-#     return response.content
-
-# async def generate_images(prompt: str):
-#     task = []
-
-#     for _ in range(4):
-#         payload = {
-#             "inputs": f"{prompt}, quality=4K, sharpness=maximum, Ultra High details, high resolution, seed = {randint(0, 1000000)}",
-#         }
-#         task = asyncio.create_task(query(payload))
-#         tasks.append(task)
-
-#     image_bytes_list = await asyncio.gather(*tasks)
-
-#     for i, image_bytes in enumerate(image_bytes_list):
-#         with open(fr"Data\{prompt.replace(' ', '_')}{i + 1}.jpg", "wb") as f:
-#             f.write(image_bytes)
-
-# def GenerateImages(prompt: str):
-#     asyncio.run(generate_images(prompt))
-#     open_images(prompt)
-
-# while True:
-#     try:
-#         with open(r"Frontend\Files\ImageGeneration.data", "r") as f:
-#             Data: str = f.read()
-
-#         Prompt, Status = Data.split(",")
-
-#         if Status == "True":
-#             print("Generation Images...")
-#             ImageStatus = GenerateImages(prompt=Prompt)
-
-#             with open(r"Frontend\Files\ImageGeneration.data", "w") as f:
-#                 f.write("False,False")
-#                 break
-#         else:
-#             sleep(1)
-    
-#     except Exception as e:
-#         print(e)
-
 import asyncio
 from random import randint
 from PIL import Image
@@ -103,7 +30,7 @@ def open_images(prompt):
 
 async def generate_single_image(prompt, index, model_name):
     """Generate one image with retry logic"""
-    for attempt in range(3):  # Retry up to 3 times
+    for attempt in range(3):  
         try:
             print(f"  🎨 Generating image {index+1} (attempt {attempt+1})...")
             
@@ -127,7 +54,7 @@ async def generate_single_image(prompt, index, model_name):
             error_msg = str(e)
             
             if "loading" in error_msg.lower():
-                wait = 10 * (attempt + 1)  # Exponential backoff
+                wait = 10 * (attempt + 1)  
                 print(f"  ⏳ Model loading, waiting {wait}s...")
                 await asyncio.sleep(wait)
             elif "rate limit" in error_msg.lower():
@@ -135,7 +62,7 @@ async def generate_single_image(prompt, index, model_name):
                 await asyncio.sleep(30)
             else:
                 print(f"  ❌ Error: {error_msg}")
-                if attempt == 2:  # Last attempt
+                if attempt == 2: 
                     return False
     
     return False
@@ -144,10 +71,10 @@ async def generate_images(prompt: str):
     """Generate 4 images concurrently with fallback models"""
     
     model_list = [
-        "stabilityai/stable-diffusion-xl-base-1.0",  # Best quality
-        "runwayml/stable-diffusion-v1-5",           # Reliable backup
-        "Lykon/DreamShaper",                        # Artistic style
-        "prompthero/openjourney"                    # Always available
+        "stabilityai/stable-diffusion-xl-base-1.0",
+        "runwayml/stable-diffusion-v1-5",           
+        "Lykon/DreamShaper",                        
+        "prompthero/openjourney"                  
     ]
     
     successful_model = None
@@ -184,7 +111,7 @@ def GenerateImages(prompt: str):
     if working_model:
         print(f"\n🎉 Success! Used model: {working_model}")
         open_images(prompt)
-        return 4  # Assume all 4 were generated
+        return 4  
     else:
         print("\n❌ All models failed. Check API key or try later.")
         return 0
@@ -203,14 +130,11 @@ def main():
                     if len(parts) >= 2 and parts[1].strip().lower() == "true":
                         prompt = parts[0].strip()
                         
-                        # Update status
                         with open(r"Frontend\Files\ImageGeneration.data", "w") as f:
                             f.write(f"{prompt},processing")
                         
-                        # Generate
                         result = GenerateImages(prompt)
                         
-                        # Mark complete
                         with open(r"Frontend\Files\ImageGeneration.data", "w") as f:
                             f.write(f"{prompt},completed,{result}")
             
