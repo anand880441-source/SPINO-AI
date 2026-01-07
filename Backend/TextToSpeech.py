@@ -4,6 +4,9 @@ import asyncio
 import edge_tts
 import os
 
+speech_paused = False
+speech_stopped = False
+
 try:
     from Backend.LanguageManager import get_current_language
 except ImportError:
@@ -35,43 +38,103 @@ async def TextToAudioFile(text) -> None:
     
     await communicate.save(file_path)
 
+def pause_speech():
+    global speech_paused
+    try:
+        if pygame.mixer.get_init() and pygame.mixer.music.get_busy():
+            pygame.mixer.music.pause()
+            speech_paused = True
+            return True
+    except:
+        pass
+    return False
+
+def resume_speech():
+    global speech_paused
+    try:
+        if speech_paused and pygame.mixer.get_init():
+            pygame.mixer.music.unpause()
+            speech_paused = False
+            return True
+    except:
+        pass
+    return False
+
+def stop_speech():
+    global speech_stopped, speech_paused
+    try:
+        if pygame.mixer.get_init():
+            pygame.mixer.music.stop()
+            speech_stopped = True
+            speech_paused = False
+            return True
+    except:
+        pass
+    return False
+
+def get_speech_status():
+    try:
+        if not pygame.mixer.get_init():
+            return {"state": "stopped", "paused": False, "stopped": True}
+        
+        if speech_paused:
+            return {"state": "paused", "paused": True, "stopped": False}
+        elif speech_stopped:
+            return {"state": "stopped", "paused": False, "stopped": True}
+        elif pygame.mixer.music.get_busy():
+            return {"state": "playing", "paused": False, "stopped": False}
+        else:
+            return {"state": "stopped", "paused": False, "stopped": True}
+    except:
+        return {"state": "unknown", "paused": False, "stopped": True}
+
 def TTS(Text, func=lambda r=None: True):
     """Convert text to speech and play it"""
+    global speech_paused, speech_stopped
+    
     if not Text or not Text.strip():
         return False
+    
+    # Reset flags
+    speech_paused = False
+    speech_stopped = False
     
     max_retries = 3
     for attempt in range(max_retries):
         try:
             asyncio.run(TextToAudioFile(Text))
             
-            pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
+            # Initialize mixer if not already initialized
+            if not pygame.mixer.get_init():
+                pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
             
             pygame.mixer.music.load(r"Data\speech.mp3")
             pygame.mixer.music.play()
             
+            # Playback loop
             while pygame.mixer.music.get_busy():
-                if func() == False: 
+                if speech_stopped:
+                    pygame.mixer.music.stop()
                     break
-                pygame.time.Clock().tick(10) 
+                    
+                if speech_paused:
+                    pygame.time.Clock().tick(10)
+                    continue
+                    
+                if func() == False:
+                    break
+                    
+                pygame.time.Clock().tick(10)
             
             return True
             
         except Exception as e:
             print(f"TTS Error (Attempt {attempt+1}/{max_retries}): {e}")
             if attempt < max_retries - 1:
-                pygame.time.wait(1000)  
+                pygame.time.wait(1000)
             else:
                 print("TTS failed after all retries")
                 return False
-        
-        finally:
-            try:
-                func(False)
-                pygame.mixer.music.stop()
-                pygame.mixer.quit()
-            except:
-                pass
     
     return False
 

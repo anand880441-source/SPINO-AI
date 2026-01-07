@@ -18,7 +18,13 @@ except ImportError:
     def get_language_status():
         return "🌍 Current Language: Hindi"
 
-env_vars = dotenv_values(".env")
+from pathlib import Path
+
+current_dir = Path(__file__).parent
+root_dir = current_dir.parent  
+env_path = root_dir / ".env"
+env_vars = dotenv_values(str(env_path))
+
 Username = env_vars.get("Username", "Anand Suthar")
 Assistantname = env_vars.get("Assistantname", "SPINO")
 

@@ -4,20 +4,31 @@ import datetime
 from dotenv import dotenv_values
 from ddgs import DDGS
 import os
-
+from pathlib import Path
 try:
     from Backend.LanguageManager import get_current_language
 except ImportError:
     def get_current_language():
         return {"current_language": "Hindi", "display_name": "Hindi"}
 
-env_vars = dotenv_values(".env")
+current_dir = Path(__file__).parent
+root_dir = current_dir.parent  
+env_path = root_dir / ".env"
+env_vars = dotenv_values(str(env_path))
 
 Username = env_vars.get("Username", "Anand Suthar")
 Assistantname = env_vars.get("Assistantname", "SPINO")
-GroqAPIKey = env_vars.get("GroqAPIKey")
+GroqAPIKey = (
+    env_vars.get("GroqAPIKey1") or 
+    env_vars.get("GroqAPIKey2") or 
+    env_vars.get("GroqAPIKey3") or 
+    env_vars.get("GroqAPIKey4") 
+)
 
 client = Groq(api_key=GroqAPIKey) if GroqAPIKey else None
+
+print(f"DEBUG: GroqAPIKey = '{GroqAPIKey}'")
+print(f"DEBUG: Client = {client}")
 
 def get_system_prompt():
     """Get dynamic system prompt based on current language"""

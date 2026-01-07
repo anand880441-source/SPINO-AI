@@ -1,24 +1,187 @@
+# from groq import Groq  
+# from rich import print
+# from dotenv import dotenv_values
+# import time
+# import random
+
+# # env_vars = dotenv_values(".env")
+# # GroqAPIKey = (
+# #     env_vars.get("GroqAPIKey1") or 
+# #     env_vars.get("GroqAPIKey2") or 
+# #     env_vars.get("GroqAPIKey3") or 
+# #     env_vars.get("GroqAPIKey4") 
+# # )
+
+# # client = Groq(api_key=GroqAPIKey) if GroqAPIKey else None
+# import os
+# from pathlib import Path
+
+# # Get correct .env path
+# current_dir = Path(__file__).parent
+# root_dir = current_dir.parent  # Go up to SPINO AI folder
+# env_path = root_dir / ".env"
+
+# print(f"DEBUG 1: .env path = {env_path}")
+# print(f"DEBUG 2: File exists? {env_path.exists()}")
+
+# env_vars = dotenv_values(str(env_path))
+# # After line with env_path
+# print(f"DEBUG 2.5: Reading .env content...")
+# with open(env_path, 'r') as f:
+#     content = f.read()
+#     print(f"DEBUG 2.6: First 200 chars:\n{content[:200]}")
+# print(f"DEBUG 3: All env keys = {list(env_vars.keys())}")
+# print(f"DEBUG 4: GroqAPIKey1 = '{env_vars.get('GroqAPIKey1')}'")
+# print(f"DEBUG 5: GroqAPIKey1 length = {len(env_vars.get('GroqAPIKey1', ''))}")
+
+# GroqAPIKey = (
+#     env_vars.get("GroqAPIKey1") or 
+#     env_vars.get("GroqAPIKey2") or 
+#     env_vars.get("GroqAPIKey3") or 
+#     env_vars.get("GroqAPIKey4") 
+# )
+
+# print(f"DEBUG 6: Combined GroqAPIKey = '{GroqAPIKey}'")
+# print(f"DEBUG 7: GroqAPIKey is None? {GroqAPIKey is None}")
+
+# client = Groq(api_key=GroqAPIKey) if GroqAPIKey else None
+# print(f"DEBUG 8: Client initialized? {client is not None}")
+# funcs = [
+#     "exit", "general", "realtime", "open", "close", "play",
+#     "generate image", "system", "content", "google search",
+#     "youtube search", "reminder", "switch language", "voice control"
+# ]
+
+# message = []
+
+# preamble = """
+# You are a very accurate Decision-Making Model, which decides what kind of a query is given to you.
+# You will decide whether a query is a 'general' query, a 'realtime' query, or is asking to perform any task or automation like 'open facebook, instagram', 'can you write a application and open it in notepad'
+# *** Do not answer any query, just decide what kind of query is given to you. ***
+# -> Respond with 'general ( query )' if a query can be answered by a llm model (conversational ai chatbot) and doesn't require any up to date information like if the query is 'who was akbar?' respond with 'general who was akbar?', if the query is 'how can i study more effectively?' respond with 'general how can i study more effectively?', if the query is 'can you help me with this math problem?' respond with 'general can you help me with this math problem?', if the query is 'Thanks, i really liked it.' respond with 'general thanks, i really liked it.' , if the query is 'what is python programming language?' respond with 'general what is python programming language?', etc. Respond with 'general (query)' if a query doesn't have a proper noun or is incomplete like if the query is 'who is he?' respond with 'general who is he?', if the query is 'what's his networth?' respond with 'general what's his networth?', if the query is 'tell me more about him.' respond with 'general tell me more about him.', and so on even if it require up-to-date information to answer. Respond with 'general (query)' if the query is asking about time, day, date, month, year, etc like if the query is 'what's the time?' respond with 'general what's the time?'.
+# -> Respond with 'realtime ( query )' if a query can not be answered by a llm model (because they don't have realtime data) and requires up to date information like if the query is 'who is indian prime minister' respond with 'realtime who is indian prime minister', if the query is 'tell me about facebook's recent update.' respond with 'realtime tell me about facebook's recent update.', if the query is 'tell me news about coronavirus.' respond with 'realtime tell me news about coronavirus.', etc and if the query is asking about any individual or thing like if the query is 'who is akshay kumar' respond with 'realtime who is akshay kumar', if the query is 'what is today's news?' respond with 'realtime what is today's news?', if the query is 'what is today's headline?' respond with 'realtime what is today's headline?', etc.
+# -> Respond with 'open (application name or website name)' if a query is asking to open any application like 'open facebook', 'open telegram', etc. but if the query is asking to open multiple applications, respond with 'open 1st application name, open 2nd application name' and so on.
+# -> Respond with 'close (application name)' if a query is asking to close any application like 'close notepad', 'close facebook', etc. but if the query is asking to close multiple applications or websites, respond with 'close 1st application name, close 2nd application name' and so on.
+# -> Respond with 'play (song name)' if a query is asking to play any song like 'play afsanay by ys', 'play let her go', etc. but if the query is asking to play multiple songs, respond with 'play 1st song name, play 2nd song name' and so on.
+# -> Respond with 'generate image (image prompt)' if a query is requesting to generate a image with given prompt like 'generate image of a lion', 'generate image of a cat', etc. but if the query is asking to generate multiple images, respond with 'generate image 1st image prompt, generate image 2nd image prompt' and so on.
+# -> Respond with 'reminder (datetime with message)' if a query is requesting to set a reminder like 'set a reminder at 9:00pm on 25th june for my business meeting.' respond with 'reminder 9:00pm 25th june business meeting'.
+# -> Respond with 'system (task name)' if a query is asking to mute, unmute, volume up, volume down , etc. but if the query is asking to do multiple tasks, respond with 'system 1st task, system 2nd task', etc.
+# -> Respond with 'content (topic)' if a query is asking to write any type of content like application, codes, emails or anything else about a specific topic but if the query is asking to write multiple types of content, respond with 'content 1st topic, content 2nd topic' and so on.
+# -> Respond with 'google search (topic)' if a query is asking to search a specific topic on google but if the query is asking to search multiple topics on google, respond with 'google search 1st topic, google search 2nd topic' and so on.
+# -> Respond with 'youtube search (topic)' if a query is asking to search a specific topic on youtube but if the query is asking to search multiple topics on youtube, respond with 'youtube search 1st topic, youtube search 2nd topic' and so on.
+# *** If the query is asking to perform multiple tasks like 'open facebook, telegram and close whatsapp' respond with 'open facebook, open telegram, close whatsapp' ***
+# *** If the user is saying goodbye or wants to end the conversation like 'bye jarvis.' respond with 'exit'.***
+# *** Respond with 'general (query)' if you can't decide the kind of query or if a query is asking to perform a task which is not mentioned above. ***
+# """
+
+# ChatHistory = [
+#     {"role": "User", "message": "how are you?"},
+#     {"role": "Chatbot", "message": "general how are you?"},
+#     {"role": "User", "message": "do you like pizza?"},
+#     {"role": "Chatbot", "message": "general do you like pizza?"},
+#     {"role": "User", "message": "open chrome and tell me about mahatma gandhi."},
+#     {"role": "Chatbot", "message": "open chrome, general tell me about mahatma gandhi."},
+#     {"role": "User", "message": "open chrome and firefox"},
+#     {"role": "Chatbot", "message": "open chrome, open firefox"},
+#     {"role": "User", "message": "what is today's date and by the way remind me that i have a dancing perfomance on 5th aug at 11pm"},
+#     {"role": "Chatbot", "message": "general what is today's date, reminder 11:00pm 5th aug danceing perfomance"},
+#     {"role": "User", "message": "chat with me."},
+#     {"role": "Chatbot", "message": "general chat with me."}
+# ]
+
+# def rate_limit_delay():
+#     """Add delay to avoid rate limits"""
+#     delay = random.uniform(2, 4)  
+#     print(f"[Rate Limiter] Waiting {delay:.1f} seconds...")
+#     time.sleep(delay)
+
+# def FirstLayerDMM(prompt: str = "test"):
+#     if not client:
+#         print("❌ Groq client not initialized. Check your API key.")
+#         return ["general"]
+    
+#     rate_limit_delay()
+    
+#     messages = [
+#         {"role": "system", "content": preamble},
+#         {"role": "user", "content": prompt}
+#     ]
+    
+#     try:
+#         completion = client.chat.completions.create(
+#             model="llama-3.3-70b-versatile",
+#             messages=messages,
+#             temperature=0.3,  
+#             max_tokens=100,
+#             top_p=0.9
+#         )
+        
+#         response = completion.choices[0].message.content.strip()
+        
+#         response = response.replace("\n", "")
+#         response = response.split(",")
+#         response = [i.strip() for i in response]
+        
+#         temp = []
+#         for task in response:
+#             for func in funcs:
+#                 if task.startswith(func):
+#                     temp.append(task)
+        
+#         response = temp
+        
+#         if "(query)" in str(response):
+#             return ["general"]
+#         else:
+#             return response
+            
+#     except Exception as e:
+#         print(f"❌ Error in classifier: {e}")
+#         return ["general"]
+
+# if __name__ == "__main__":
+#     while True:
+#         user_input = input(">>> ").strip()
+#         if user_input.lower() == 'exit':
+#             break
+#         result = FirstLayerDMM(user_input)
+#         print(f"Decision: {result}")
+
+
 from groq import Groq  
 from rich import print
 from dotenv import dotenv_values
 import time
 import random
+import os
+from pathlib import Path
 
-env_vars = dotenv_values(".env")
-env_vars = dotenv_values(".env")
-GroqAPIKey = (
-    env_vars.get("GroqAPIKey1") or 
-    env_vars.get("GroqAPIKey2") or 
-    env_vars.get("GroqAPIKey3") or 
-    env_vars.get("GroqAPIKey4") 
-)
+# Get correct .env path
+current_dir = Path(__file__).parent
+root_dir = current_dir.parent  # Go up to SPINO AI folder
+env_path = root_dir / ".env"
 
-client = Groq(api_key=GroqAPIKey) if GroqAPIKey else None
+env_vars = dotenv_values(str(env_path))
+
+groq_keys = [
+    env_vars.get("GroqAPIKey1", ""),
+    env_vars.get("GroqAPIKey2", ""),
+    env_vars.get("GroqAPIKey3", ""),
+    env_vars.get("GroqAPIKey4", ""),
+]
+
+groq_keys = [key for key in groq_keys if key and key.strip()]
+
+if groq_keys:
+    client = Groq(api_key=groq_keys[0])
+else:
+    client = None
+    print("❌ No Groq API keys found")
 
 funcs = [
     "exit", "general", "realtime", "open", "close", "play",
     "generate image", "system", "content", "google search",
-    "youtube search", "reminder", "switch language", "voice control"
+    "youtube search", "reminder", "switch language", "voice"
 ]
 
 message = []
@@ -35,6 +198,7 @@ You will decide whether a query is a 'general' query, a 'realtime' query, or is 
 -> Respond with 'generate image (image prompt)' if a query is requesting to generate a image with given prompt like 'generate image of a lion', 'generate image of a cat', etc. but if the query is asking to generate multiple images, respond with 'generate image 1st image prompt, generate image 2nd image prompt' and so on.
 -> Respond with 'reminder (datetime with message)' if a query is requesting to set a reminder like 'set a reminder at 9:00pm on 25th june for my business meeting.' respond with 'reminder 9:00pm 25th june business meeting'.
 -> Respond with 'system (task name)' if a query is asking to mute, unmute, volume up, volume down , etc. but if the query is asking to do multiple tasks, respond with 'system 1st task, system 2nd task', etc.
+-> Respond with 'voice (command)' if a query is asking to control speech like 'pause speech', 'resume speech', 'stop speaking', 'voice pause', 'voice resume', 'voice stop', etc.
 -> Respond with 'content (topic)' if a query is asking to write any type of content like application, codes, emails or anything else about a specific topic but if the query is asking to write multiple types of content, respond with 'content 1st topic, content 2nd topic' and so on.
 -> Respond with 'google search (topic)' if a query is asking to search a specific topic on google but if the query is asking to search multiple topics on google, respond with 'google search 1st topic, google search 2nd topic' and so on.
 -> Respond with 'youtube search (topic)' if a query is asking to search a specific topic on youtube but if the query is asking to search multiple topics on youtube, respond with 'youtube search 1st topic, youtube search 2nd topic' and so on.
