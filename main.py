@@ -24,6 +24,14 @@ import os
 import warnings
 import asyncio
 from Backend.Automation import Automation
+import keyboard
+from Backend.Automation import VoiceControl
+
+def setup_hotkeys():
+    keyboard.add_hotkey('ctrl+shift+p', lambda: VoiceControl("pause"))
+    keyboard.add_hotkey('ctrl+shift+r', lambda: VoiceControl("resume"))
+    keyboard.add_hotkey('ctrl+shift+s', lambda: VoiceControl("stop"))
+    print("✅ Voice hotkeys set")
 
 try:
     from Backend.LanguageManager import get_language_status, get_current_language
@@ -53,7 +61,8 @@ DefaultMessage = get_welcome_message()
 
 subprocesses = []
 Functions = ["open", "close", "play", "system", "content", "google search", 
-             "youtube search", "switch language", "generate", "create image"]
+             "youtube search", "switch language", "generate", "create image",
+             "pause", "resume", "stop"]
 
 def ShowDefaultChatIfNoChats():
     os.makedirs("Data", exist_ok=True)
@@ -164,8 +173,12 @@ def MainExecution():
             break
 
     for queries in Decision:
+        print(f"DEBUG: Processing query: '{queries}'")
+        print(f"DEBUG: Functions check: {any(queries.startswith(func) for func in Functions)}")
+    
         if not TaskExecution:
             if any(queries.startswith(func) for func in Functions):
+                print(f"DEBUG: Calling Automation for: '{queries}'")
                 try:
                     run(Automation(list(Decision)))
                     TaskExecution = True
@@ -284,5 +297,5 @@ if __name__ == "__main__":
 
     # print("🧪 Testing Automation directly...")
     # asyncio.run(Automation(["generate image of modi"]))
-    
+    setup_hotkeys()
     SecondThread()
